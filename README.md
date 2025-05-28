@@ -137,7 +137,8 @@ y_pred = nilai prediksi
 | Linear Regression           | 4257.30   | 3755.92   | 70379311.89   | 51797278.35   |
 | KNN Regressor               | 3692.40   | 5090.79   | 51390020.71   | 94128237.52   |
 
-![alt text](image.png)
+![image](https://github.com/user-attachments/assets/010522f8-d774-4d14-aa01-e74778aefc83)
+
 
 **Random Forest Regressor** menunjukkan performa terbaik pada data uji dengan Test MAE sebesar 1964.85.
 ---

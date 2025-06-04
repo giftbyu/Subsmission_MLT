@@ -164,7 +164,7 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
 
 
 1. RMSE (Root Mean Squared Error): Mengukur rata-rata magnitudo error prediksi rating. Nilai yang lebih rendah menunjukkan performa yang lebih baik.  
-   Formula: RMSE= N1​∑(u,i)∈TestSet​(rui​−r^ui​)2​ dimana N adalah jumlah rating di test set, rui​ adalah rating aktual, dan r^ui​ adalah rating prediksi.
+   Formula: RMSE= ![image](https://github.com/user-attachments/assets/48ed16dd-5a15-42d1-8d82-ea7f90feed5e) dimana N adalah jumlah rating di test set, rui​ adalah rating aktual, dan r^ui​ adalah rating prediksi.
 
    2. MAE (Mean Absolute Error): Mengukur rata-rata magnitudo absolut error prediksi rating. Nilai yang lebih rendah menunjukkan performa yang lebih baik.  
       Formula: MAE=N1​∑(u,i)∈TestSet​∣rui​−r^ui​∣  

@@ -41,25 +41,27 @@ Untuk mencapai tujuan di atas, beberapa pendekatan solusi akan diimplementasikan
 
 **Variabel-variabel pada dataset movies.csv**:
 
-![][image1]
+![image](https://github.com/user-attachments/assets/173275dc-be7b-4d74-974d-ed26241292f7)
+
 
 **Variabel-variabel pada dataset ratings.csv**:
 
-![][image2]
+![image](https://github.com/user-attachments/assets/deb59a29-6e0d-4ccb-a54b-4eec719c6606)
+
 
 **Exploratory Data Analysis (EDA) Tambahan**:
 
 * **Distribusi Rating Film Keseluruhan**: 
+![image](https://github.com/user-attachments/assets/aad11515-695a-46e4-a98e-6fb3a1575e4e)
 
-![][image3]
 
 * **Distribusi Jumlah Rating per Pengguna**: 
+![image](https://github.com/user-attachments/assets/f3a336fe-f67d-485e-b51c-502f13643a01)
 
-![][image4]
 
 * **Distribusi Jumlah Rating per Film**: 
+ ![image](https://github.com/user-attachments/assets/e62a0af6-4353-4c36-8b01-997ebf481007)
 
-![][image5]
 
 * **Analisis Missing Values**: Tidak ditemukan nilai yang hilang pada kedua dataset.  
 * **Analisis Sparsity Dataset**: Matriks User-Item memiliki *sparsity* sebesar 98.30%. Ini menunjukkan bahwa sebagian besar film belum diberi rating oleh sebagian besar pengguna, yang merupakan karakteristik umum *dataset* sistem rekomendasi.  
@@ -158,13 +160,11 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
 
 * **Metrik yang Digunakan**:
 
-![][image6]
+![image](https://github.com/user-attachments/assets/79470bba-e0eb-4176-a424-a98e6ff8bc55)
+
 
 1. RMSE (Root Mean Squared Error): Mengukur rata-rata magnitudo error prediksi rating. Nilai yang lebih rendah menunjukkan performa yang lebih baik.  
-   Formula: RMSE= 
-
-   ![][image7]  
-   dimana N adalah jumlah rating di test set, rui​ adalah rating aktual, dan r^ui​ adalah rating prediksi.
+   Formula: RMSE= N1​∑(u,i)∈TestSet​(rui​−r^ui​)2​ dimana N adalah jumlah rating di test set, rui​ adalah rating aktual, dan r^ui​ adalah rating prediksi.
 
    2. MAE (Mean Absolute Error): Mengukur rata-rata magnitudo absolut error prediksi rating. Nilai yang lebih rendah menunjukkan performa yang lebih baik.  
       Formula: MAE=N1​∑(u,i)∈TestSet​∣rui​−r^ui​∣  

@@ -184,6 +184,7 @@ Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Conten
 Evaluasi dilakukan secara berbeda untuk masing-masing pendekatan model.
 
 1\. Evaluasi Model Content-Based Filtering 
+
 **Evaluasi Kuantitatif**: Metodologi evaluasi kuantitatif dilakukan dengan mengasumsikan film yang disukai pengguna dengan genre serupa sebagai item yang relevan.
 
  * Rata-rata Precision@10: 0.0666

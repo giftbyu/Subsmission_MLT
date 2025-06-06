@@ -40,16 +40,49 @@ Untuk mencapai tujuan di atas, beberapa pendekatan solusi akan diimplementasikan
 2. ratings.csv: Berisi informasi rating yang diberikan oleh pengguna terhadap film.
 
 **Variabel-variabel pada dataset movies.csv**:
+ * movieId: ID unik untuk setiap film (Integer).
+
+* title: Judul film, termasuk tahun rilis dalam tanda kurung (Object/String).
+
+* genres: Genre film, dipisahkan oleh karakter |. Beberapa film mungkin memiliki genre (no genres listed) (Object/String).
+
+    * Jumlah data: 9742 baris
+    
+    * Jumlah kolom: 3
+    
+    * Tidak terdapat nilai yang hilang (missing values)
+
+    * Tidak ditemukan data duplikat pada dataset movies_df, pengecekan dilakukan pada kolom "title".
 
 ![image](https://github.com/user-attachments/assets/173275dc-be7b-4d74-974d-ed26241292f7)
 
 
-**Variabel-variabel pada dataset ratings.csv**:
+ **Variabel-variabel pada dataset ratings.csv**:
+  * userId: ID unik untuk setiap pengguna (Integer).
+  
+  * movieId: ID unik untuk film yang diberi rating (Integer).
+  
+  * rating: Rating yang diberikan pengguna untuk film, dalam skala 0.5 hingga 5.0 (Float).
+   
+  * timestamp: Waktu pemberian rating dalam format Unix timestamp (Integer).
+ 
+     * Jumlah data: 100836 baris
+     
+     * Jumlah kolom: 4
+     
+     * Tidak terdapat nilai yang hilang (missing values)
+   
+     * Tidak ditemukan data duplikat pada dataset ratings_df, pengecekan dilakukan pada kombinasi "userId" dan "moviesId".
 
 ![image](https://github.com/user-attachments/assets/deb59a29-6e0d-4ccb-a54b-4eec719c6606)
 
 
 **Exploratory Data Analysis (EDA) Tambahan**:
+* **Distribusi Rating**: Mayoritas film diberi rating 3.0, 4.0, dan 5.0.
+
+* **Aktivitas Pengguna**: Sebagian besar pengguna memberikan kurang dari 100 rating, namun terdapat power users yang memberikan lebih dari 2000 rating.
+
+* **Sparsity Dataset**: Matriks User-Item memiliki sparsity sebesar 98.30%, yang umum terjadi pada dataset rekomendasi.
 
 * **Distribusi Rating Film Keseluruhan**: 
 ![image](https://github.com/user-attachments/assets/aad11515-695a-46e4-a98e-6fb3a1575e4e)
@@ -63,10 +96,14 @@ Untuk mencapai tujuan di atas, beberapa pendekatan solusi akan diimplementasikan
  ![image](https://github.com/user-attachments/assets/e62a0af6-4353-4c36-8b01-997ebf481007)
 
 
-* **Analisis Missing Values**: Tidak ditemukan nilai yang hilang pada kedua dataset.  
+* **Analisis Missing Values**: Tidak ditemukan nilai yang hilang pada kedua dataset.
+*  **Analisis Duplikat**: Tidak ada data duplikat (0) pada kedua dataset, yang mengindikasikan kualitas data yang baik berdasarkan hasil ini. 
 * **Analisis Sparsity Dataset**: Matriks User-Item memiliki *sparsity* sebesar 98.30%. Ini menunjukkan bahwa sebagian besar film belum diberi rating oleh sebagian besar pengguna, yang merupakan karakteristik umum *dataset* sistem rekomendasi.  
 * **Analisis Genre Film**: Genre yang paling umum adalah Drama, diikuti oleh Comedy, Thriller, dan Action. Terdapat 34 film dengan label (no genres listed).  
 * **Distribusi Tahun Rilis Film**: Film dalam *dataset* ini memiliki rentang tahun rilis yang luas, dengan puncak distribusi pada tahun 1990-an dan awal 2000-an.
+* **Penanganan Outlier**: Analisis outlier dilakukan pada distribusi jumlah rating yang diberikan oleh setiap pengguna. Dengan menggunakan metode IQR, ditemukan bahwa pengguna yang memberikan rating lebih dari ~368 film dapat dianggap sebagai outlier statistik.
+
+Meskipun secara statistik terdeteksi sebagai outlier, data ini dianggap aman dan tidak dihapus. Outlier dalam konteks ini merepresentasikan "power users" atau pengguna yang sangat aktif. Data interaksi mereka yang kaya sangat berharga untuk melatih model Collaborative Filtering, karena memberikan sinyal preferensi yang kuat dan membantu model menemukan pola dengan lebih baik. Oleh karena itu, penanganan yang dilakukan adalah mempertahankan data ini untuk analisis lebih lanjut.
 
 ## **Data Preparation**
 
@@ -146,15 +183,26 @@ Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Conten
 
 Evaluasi dilakukan secara berbeda untuk masing-masing pendekatan model.
 
-1\. Evaluasi Model Content-Based Filtering (Kualitatif)  
-Model CBF dievaluasi secara kualitatif dengan mengambil beberapa contoh film acak dari dataset dan melihat 5 rekomendasi teratas yang dihasilkan oleh model.
+1\. **Evaluasi Kuantitatif**: Metodologi evaluasi kuantitatif dilakukan dengan mengasumsikan film yang disukai pengguna dengan genre serupa sebagai item yang relevan.
 
-* **Contoh Hasil**:  
-  * Untuk 'Notorious Bettie Page, The (2005)': direkomendasikan film seperti 'Cry, the Beloved Country (1995)', 'Restoration (1995)', dll., dengan skor kesamaan 1.00.  
-  * Untuk 'Star Trek V: The Final Frontier (1989)': direkomendasikan film seperti 'Barb Wire (1996)', 'Starship Troopers (1997)', dll., dengan skor kesamaan 1.00.  
-  * Untuk 'Starsky & Hutch (2004)': direkomendasikan film seperti 'Supercop (Police Story 3: Supercop) (Jing cha gu shi III: Chao ji jing cha) (1992)', 'Lethal Weapon 4 (1998)', dll., dengan skor kesamaan 1.00.  
-* **Analisis**: Skor kesamaan 1.00 menunjukkan bahwa 'tags' dari film yang direkomendasikan identik dengan 'tags' dari film input setelah proses TF-IDF dan *stop word removal*. Ini mengindikasikan film-film tersebut memiliki judul (tanpa spasi) dan kombinasi genre yang sangat mirip atau bahkan sama. Meskipun secara fitur identik, ini tidak selalu berarti rekomendasi sempurna karena nuansa konten bisa berbeda. Untuk meningkatkan kualitas, fitur yang lebih kaya (misalnya, sinopsis, aktor, sutradara) dapat dipertimbangkan.
+ * Rata-rata Precision@10: 0.0666
 
+ * Rata-rata Recall@10: 0.0087
+
+ * Analisis: Nilai metrik yang relatif rendah ini wajar untuk model CBF murni, karena model ini merekomendasikan berdasarkan kemiripan konten saja dan tidak mempertimbangkan riwayat tontonan unik atau preferensi laten dari pengguna.
+
+**Contoh Hasil Rekomendasi (Kualitatif)**: Berikut adalah contoh rekomendasi untuk film "Next Three Days, The (2010)".
+
+ * Return to Paradise (1998) (Skor Kesamaan: 1.00)
+
+ * Subway (1985) (Skor Kesamaan: 1.00)
+
+ * Harvard Man (2001) (Skor Kesamaan: 1.00)
+
+ * Air I Breathe, The (2007) (Skor Kesamaan: 1.00)
+
+ * Next Three Days, The (2010) (Skor Kesamaan: 1.00)
+   
 2\. Evaluasi Model Collaborative Filtering (SVD)  
 Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperparameter tuning.
 
@@ -167,7 +215,8 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
    Formula: RMSE= ![image](https://github.com/user-attachments/assets/48ed16dd-5a15-42d1-8d82-ea7f90feed5e) dimana N adalah jumlah rating di test set, rui​ adalah rating aktual, dan r^ui​ adalah rating prediksi.
 
    2. MAE (Mean Absolute Error): Mengukur rata-rata magnitudo absolut error prediksi rating. Nilai yang lebih rendah menunjukkan performa yang lebih baik.  
-      Formula: MAE=N1​∑(u,i)∈TestSet​∣rui​−r^ui​∣  
+      Formula: ![image](https://github.com/user-attachments/assets/878a3139-d350-4aa6-adba-8dd5cf9cc50b)
+ 
    3. Precision@k: Proporsi item yang direkomendasikan dalam top-k yang relevan.  
       Formula: Precision@k=k∣Recommended items in top-k∩Relevant items∣​  
       Item dianggap relevan jika rating aktualnya ≥ threshold (dalam kasus ini, 4.0).  
@@ -193,22 +242,42 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
 3\. Evaluasi Model Hybrid (Kualitatif)  
 Model Hybrid dievaluasi secara kualitatif dengan memberikan contoh rekomendasi untuk pengguna tertentu, membandingkan dengan film yang pernah dirating tinggi oleh pengguna tersebut, dan melihat kontribusi skor SVD dan CBF.
 
-* **Contoh Hasil (untuk UserID 229, film referensi 'Toy Story (1995)')**:  
-  * Film rating tinggi: Toy Story (1995) (Rating: 5.0), Braveheart (1995) (Rating: 5.0), Babe (1995) (Rating: 5.0).  
+* **Contoh Hasil rekomendasi (UserID 33, untuk model SVD dan referensi:'Next Three Days, The (2010)' untuk Hybrid)**:
+  * Rekomendasi SVD (Optimal):
+    1. Paths of Glory (1957) (Prediksi Rating: 4.70)
+    2. Guess Who's Coming to Dinner (1967) (Prediksi Rating: 4.69)
+    3. Dune (2000) (Prediksi Rating: 4.66)
+    4. Three Billboards Outside Ebbing, Missouri (2017) (Prediksi Rating: 4.65)
+    5. Adam's Rib (1949) (Prediksi Rating: 4.58)
+       
   * Rekomendasi Hybrid:  
-    1. Ponyo (Gake no ue no Ponyo) (2008) (Skor Hybrid: 0.90, Pred SVD: 4.42, Sim CBF: 0.96)  
-    2. Kubo and the Two Strings (2016) (Skor Hybrid: 0.87, Pred SVD: 4.22, Sim CBF: 0.96)  
-    3. Toy Story 2 (1999) (Skor Hybrid: 0.87, Pred SVD: 4.15, Sim CBF: 1.00)  
-* **Analisis**: Rekomendasi hybrid menunjukkan kombinasi antara film yang mirip secara konten dengan film referensi (kontribusi CBF tinggi, misal Toy Story 2\) dan film yang diprediksi akan disukai berdasarkan pola rating (kontribusi SVD tinggi, misal Ponyo). Ini menunjukkan potensi model hybrid dalam memberikan rekomendasi yang relevan dan beragam.
+    1. Infernal Affairs (Mou gaan dou) (2002) (Skor Hybrid: 0.88)
+    2. Departed, The (2006) (Skor Hybrid: 0.85)
+    3. Three Billboards Outside Ebbing, Missouri (2017) (Skor Hybrid: 0.85)
+    4. Man Bites Dog (C'est arrivé près de chez vous) (1992) (Skor Hybrid: 0.85)
+    5. Badlands (1973) (Skor Hybrid: 0.84) 
 
 Kesimpulan Proyek:  
 Proyek sistem rekomendasi film ini telah berhasil mengembangkan dan mengevaluasi:
-
-1. Model *Content-Based Filtering* menggunakan TF-IDF dan *Cosine Similarity*.  
-2. Model *Collaborative Filtering* menggunakan SVD dari *library Surprise*, termasuk *tuning hyperparameter* yang menghasilkan peningkatan performa (penurunan RMSE sebesar 2.06%).  
+1. Model Content-Based Filtering menggunakan TF-IDF dan Cosine Similarity.
+2. Model Collaborative Filtering menggunakan SVD dari library Surprise, termasuk tuning hyperparameter.
 3. Model Hybrid sederhana yang menggabungkan skor dari SVD dan kesamaan CBF.
 
-Performa model SVD yang telah di-*tuning* menunjukkan hasil yang cukup baik sebagai dasar untuk rekomendasi. Model CBF dan Hybrid memberikan alternatif rekomendasi yang dapat melengkapi satu sama lain.
+--- Hasil Evaluasi Kuantitatif ---
+
+*Model Collaborative Filtering (SVD)*
+  RMSE SVD Awal: 0.8807 -> RMSE SVD Setelah Tuning: 0.8607
+  > Terjadi peningkatan (penurunan RMSE) sebesar 2.27%.
+  Precision@10 SVD (Tuning): 0.5689
+  Recall@10 SVD (Tuning): 0.6677
+
+*Model Content-Based Filtering*
+  Rata-rata Precision@10 CBF: 0.0666
+  Rata-rata Recall@10 CBF: 0.0087
+
+Berikut adalah Visualisasi Perbandingan Metrik Evaluasi  
+![image](https://github.com/user-attachments/assets/0b5b7584-1bf9-4a1b-9194-00edb40d03db)
+Grafik perbandingan di bawah ini menunjukkan bahwa model SVD (Tuning) memiliki skor Precision@10 dan Recall@10 yang jauh lebih unggul dibandingkan dengan model CBF. Ini secara visual mengkonfirmasi bahwa model Collaborative Filtering lebih akurat dalam memberikan rekomendasi yang relevan untuk dataset ini.
 
 Referensi :   
 Kurniawan, H. H., Lukman, W. S., Fredyan, R., & Ibrahim, M. A. (2024). *Movie Recommendation System: A Comparison of Content-Based and Collaborative Filtering*. Procedia Computer Science. https://doi.org/10.1016/j.procs.2024.10.313

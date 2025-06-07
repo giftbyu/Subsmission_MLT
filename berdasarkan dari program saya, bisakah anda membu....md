@@ -270,7 +270,7 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
   * MAE: 0.6594  
   * Precision@10 (threshold 4.0): 0.8687  
   * Recall@10 (threshold 4.0): 0.3102  
-* **Analisis**: Setelah *hyperparameter tuning*, terjadi peningkatan performa model SVD. RMSE menurun dari 0.8807 menjadi 0.8626 (peningkatan sebesar 2.06%). MAE juga menunjukkan perbaikan, menurun dari 0.6766 menjadi 0.6614. Metrik Precision@10 dan Recall@10 juga mengalami sedikit peningkatan, menunjukkan bahwa model yang telah di-*tuning* mampu memberikan rekomendasi yang sedikit lebih relevan.
+* **Analisis**: Setelah *hyperparameter tuning*, terjadi peningkatan performa model SVD. RMSE menurun dari 0.8807 menjadi 0.8605 (peningkatan sebesar 2.30%). MAE juga menunjukkan perbaikan, menurun dari 0.6766 menjadi 0.6594. Metrik Precision@10 dan Recall@10 juga mengalami sedikit peningkatan, menunjukkan bahwa model yang telah di-*tuning* mampu memberikan rekomendasi yang sedikit lebih relevan.
 
 3\. Evaluasi Model Hybrid (Kualitatif)  
 Model Hybrid dievaluasi secara kualitatif dengan memberikan contoh rekomendasi untuk pengguna tertentu, membandingkan dengan film yang pernah dirating tinggi oleh pengguna tersebut, dan melihat kontribusi skor SVD dan CBF.

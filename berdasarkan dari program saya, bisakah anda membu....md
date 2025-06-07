@@ -140,44 +140,75 @@ Tahapan ini menyiapkan data rating agar sesuai dengan format yang dibutuhkan ole
 
 Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Content-Based Filtering*, *Collaborative Filtering* menggunakan SVD, dan model Hybrid.
 
-**1\. Content-Based Filtering (CBF)**
+* **1. Content-Based Filtering (CBF)**
 
-* **Cara Kerja**: Model ini merekomendasikan film berdasarkan kemiripan konten. Konten film direpresentasikan oleh fitur 'tags' yang merupakan gabungan dari judul (tanpa spasi, huruf kecil) dan genre (huruf kecil, spasi sebagai pemisah antar genre). Fitur 'tags' ini kemudian diubah menjadi vektor numerik menggunakan TF-IDF. Kemiripan antar film dihitung menggunakan *Cosine Similarity* pada matriks TF-IDF tersebut. Ketika pengguna menyukai suatu film, sistem akan mencari film-film lain yang memiliki skor kesamaan kosinus tertinggi dengan film tersebut.  
-* **Output**: Fungsi get\_content\_based\_recommendations menerima judul film (yang sudah dibersihkan) sebagai input dan mengembalikan daftar top-N film yang paling mirip beserta skor kesamaannya. Fungsi ini juga menyertakan pencocokan judul menggunakan difflib jika judul input tidak persis ditemukan.  
-* **Kelebihan**:  
-  * Tidak memerlukan data rating dari pengguna lain (mengatasi *user cold start* jika pengguna baru sudah memiliki preferensi film awal).  
-  * Dapat merekomendasikan item yang baru dan kurang populer selama fiturnya dapat diekstrak.  
-  * Rekomendasi bersifat transparan dan mudah dijelaskan (berdasarkan kemiripan fitur).  
-* **Kekurangan**:  
-  * Kualitas rekomendasi sangat bergantung pada kualitas rekayasa fitur. Jika fitur tidak representatif, rekomendasi akan buruk.  
-  * Cenderung merekomendasikan item yang sangat mirip (kurang *serendipity* atau kebaruan).  
-  * Tidak dapat menangkap preferensi laten pengguna yang tidak tercermin dalam fitur item.
+* Cara Kerja: Merekomendasikan film berdasarkan kemiripan konten yang dihitung menggunakan Cosine Similarity dari vektor TF-IDF judul dan genre.
 
-**2\. Collaborative Filtering (CF) \- SVD (Surprise)**
+* Kelebihan: Dapat menangani masalah item cold-start dan rekomendasinya transparan.
 
-* **Cara Kerja**: Model ini menggunakan algoritma Singular Value Decomposition (SVD), sebuah teknik faktorisasi matriks. SVD memfaktorkan matriks user-item rating yang *sparse* menjadi matriks fitur laten pengguna dan matriks fitur laten item. Dengan mengalikan kembali kedua matriks fitur laten ini, kita dapat memprediksi rating untuk pasangan user-item yang belum ada dalam data asli. Model dilatih pada trainset dan diuji pada testset. *Hyperparameter* SVD dioptimalkan menggunakan GridSearchCV dari *library Surprise* untuk menemukan kombinasi parameter terbaik berdasarkan RMSE.  
-* **Output**: Model SVD yang telah dilatih (best\_svd\_model) dapat digunakan untuk memprediksi rating seorang pengguna terhadap film tertentu. Fungsi get\_svd\_recommendations\_for\_user menghasilkan daftar top-N film yang diprediksi akan mendapatkan rating tertinggi dari pengguna tersebut (tidak termasuk film yang sudah dirating).  
-* **Kelebihan**:  
-  * Mampu menangkap preferensi laten pengguna dan item yang kompleks.  
-  * Tidak memerlukan fitur eksplisit dari item, hanya data interaksi (rating).  
-  * Dapat menghasilkan rekomendasi yang lebih *serendipitous* dibandingkan CBF murni.  
-* **Kekurangan**:  
-  * Mengalami masalah *cold start*: sulit memberikan rekomendasi untuk pengguna baru (yang belum memberikan rating) atau item baru (yang belum mendapatkan rating).  
-  * Performa dapat menurun pada dataset yang sangat *sparse*.  
-  * Rekomendasi kurang transparan (sulit menjelaskan mengapa item tertentu direkomendasikan).
+* Kekurangan: Terbatas pada fitur yang ada dan kurang memiliki kemampuan untuk menemukan hal-hal baru (serendipity).
 
-**3\. Model Hybrid (CBF \+ CF-SVD)**
+* Contoh Hasil Rekomendasi (Top-5): Berikut adalah contoh rekomendasi untuk film "Next Three Days, The (2010)".
+   
+   * Return to Paradise (1998) (Skor Kesamaan: 1.00)
+   
+   * Subway (1985) (Skor Kesamaan: 1.00)
+   
+   * Harvard Man (2001) (Skor Kesamaan: 1.00)
+   
+   * Air I Breathe, The (2007) (Skor Kesamaan: 1.00)
+   
+   * Next Three Days, The (2010) (Skor Kesamaan: 1.00)
+     
+![image](https://github.com/user-attachments/assets/5cccc635-e5c3-4af7-a345-b0913ffc39bf)
 
-* **Cara Kerja**: Model hybrid ini menggabungkan skor dari model SVD (CF) dan skor kesamaan dari CBF. Untuk seorang pengguna dan film referensi yang disukainya, sistem pertama-tama mendapatkan skor prediksi rating dari model SVD untuk semua film yang belum dirating oleh pengguna tersebut. Skor prediksi ini kemudian dinormalisasi ke rentang \[0, 1\]. Secara paralel, skor kesamaan CBF (berdasarkan *cosine similarity* dari 'tags') antara film referensi dan semua film lain dihitung. Skor hybrid final untuk setiap film kandidat dihitung sebagai rata-rata tertimbang dari skor SVD yang dinormalisasi dan skor kesamaan CBF. Bobot yang digunakan dalam proyek ini adalah 0.7 untuk CF (SVD) dan 0.3 untuk CBF.  
-* **Output**: Fungsi get\_hybrid\_recommendations menerima ID pengguna dan judul film referensi (yang sudah dibersihkan) sebagai input. Fungsi ini mengembalikan daftar top-N film dengan skor hybrid tertinggi, beserta detail skor SVD dan CBF individualnya.  
-* **Kelebihan**:  
-  * Berpotensi menggabungkan keunggulan dari kedua pendekatan (misalnya, akurasi CF dengan kemampuan CBF menangani item baru jika fiturnya tersedia).  
-  * Dapat memberikan rekomendasi yang lebih beragam dan relevan.  
-  * Dapat sedikit mengurangi masalah *cold start* jika film referensi memiliki fitur yang bisa dibandingkan.  
-* **Kekurangan**:  
-  * Lebih kompleks untuk diimplementasikan dan di-*tuning* dibandingkan model tunggal.  
-  * Penentuan bobot yang optimal untuk menggabungkan skor bisa menjadi tantangan dan mungkin memerlukan eksperimen lebih lanjut.  
-  * Masalah *user cold start* (untuk pengguna yang benar-benar baru tanpa riwayat rating sama sekali) masih menjadi tantangan.
+     
+
+* **2. Collaborative Filtering (CF) - SVD**
+
+* Cara Kerja: Menggunakan Singular Value Decomposition (SVD) untuk memfaktorkan matriks user-item dan menemukan fitur laten dari pengguna dan item, yang kemudian digunakan untuk memprediksi rating.
+
+* Kelebihan: Mampu menangkap preferensi laten pengguna dan menghasilkan rekomendasi yang serendipitous.
+
+* Kekurangan: Mengalami masalah user cold-start dan item cold-start.
+
+* Contoh Hasil Rekomendasi (Top-5 untuk UserID 33):
+
+* Paths of Glory (1957) (Prediksi Rating: 4.70)
+   
+   * Guess Who's Coming to Dinner (1967) (Prediksi Rating: 4.69)
+   
+   * Dune (2000) (Prediksi Rating: 4.66)
+   
+   * Three Billboards Outside Ebbing, Missouri (2017) (Prediksi Rating: 4.65)
+   
+   * Adam's Rib (1949) (Prediksi Rating: 4.58)
+     
+
+![image](https://github.com/user-attachments/assets/a2051ee3-d564-4941-bf72-f6de09fa8e02)
+
+* **3. Model Hybrid (CBF + CF-SVD)**
+
+* Cara Kerja: Menggabungkan skor prediksi rating dari model SVD dan skor kesamaan konten dari CBF dengan sistem pembobotan untuk menghasilkan skor rekomendasi akhir.
+
+* Kelebihan: Berpotensi menggabungkan keunggulan dari kedua pendekatan.
+
+* Kekurangan: Lebih kompleks untuk diimplementasikan dan memerlukan penentuan bobot yang optimal.
+
+* Contoh Hasil Rekomendasi (Top-5 untuk UserID 33, Referensi: 'Next Three Days, The (2010)'):
+   
+   * Infernal Affairs (Mou gaan dou) (2002) (Skor Hybrid: 0.88)
+   
+   * Departed, The (2006) (Skor Hybrid: 0.85)
+   
+   * Three Billboards Outside Ebbing, Missouri (2017) (Skor Hybrid: 0.85)
+   
+   * Man Bites Dog (C'est arrivé près de chez vous) (1992) (Skor Hybrid: 0.85)
+   
+   * Badlands (1973) (Skor Hybrid: 0.84)
+     
+![image](https://github.com/user-attachments/assets/1cf1ba3b-cba2-4de8-ab95-9989ccdca844)
+
 
 ## **Evaluation**
 
@@ -235,10 +266,10 @@ Model SVD dievaluasi menggunakan metrik kuantitatif sebelum dan sesudah hyperpar
   * Parameter terbaik untuk RMSE: {'n\_factors': 100, 'n\_epochs': 30, 'lr\_all': 0.01, 'reg\_all': 0.1}.  
   * RMSE terbaik (cross-validation): 0.8743.  
 * **Hasil Evaluasi SVD (Setelah Tuning)**:  
-  * RMSE: 0.8626  
-  * MAE: 0.6614  
-  * Precision@10 (threshold 4.0): 0.5680  
-  * Recall@10 (threshold 4.0): 0.6677  
+  * RMSE: 0.8605  
+  * MAE: 0.6594  
+  * Precision@10 (threshold 4.0): 0.8687  
+  * Recall@10 (threshold 4.0): 0.3102  
 * **Analisis**: Setelah *hyperparameter tuning*, terjadi peningkatan performa model SVD. RMSE menurun dari 0.8807 menjadi 0.8626 (peningkatan sebesar 2.06%). MAE juga menunjukkan perbaikan, menurun dari 0.6766 menjadi 0.6614. Metrik Precision@10 dan Recall@10 juga mengalami sedikit peningkatan, menunjukkan bahwa model yang telah di-*tuning* mampu memberikan rekomendasi yang sedikit lebih relevan.
 
 3\. Evaluasi Model Hybrid (Kualitatif)  

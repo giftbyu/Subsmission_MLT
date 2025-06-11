@@ -106,9 +106,6 @@ Untuk mencapai tujuan di atas, beberapa pendekatan solusi akan diimplementasikan
 Meskipun secara statistik terdeteksi sebagai outlier, data ini dianggap aman dan tidak dihapus. Outlier dalam konteks ini merepresentasikan "power users" atau pengguna yang sangat aktif. Data interaksi mereka yang kaya sangat berharga untuk melatih model Collaborative Filtering, karena memberikan sinyal preferensi yang kuat dan membantu model menemukan pola dengan lebih baik. Oleh karena itu, penanganan yang dilakukan adalah mempertahankan data ini untuk analisis lebih lanjut.
 
 ## **Data Preparation**
-
-Proses persiapan data dilakukan secara terpisah untuk kebutuhan *Content-Based Filtering* dan *Collaborative Filtering*.
-
 * **Analisis Missing Values**: Tidak ditemukan nilai yang hilang pada kedua dataset.
 *  **Analisis Duplikat**: Tidak ada data duplikat (0) pada kedua dataset, yang mengindikasikan kualitas data yang baik berdasarkan hasil ini. 
 * **Analisis Sparsity Dataset**: Matriks User-Item memiliki *sparsity* sebesar 98.30%. Ini menunjukkan bahwa sebagian besar film belum diberi rating oleh sebagian besar pengguna, yang merupakan karakteristik umum *dataset* sistem rekomendasi.  
@@ -118,6 +115,7 @@ Proses persiapan data dilakukan secara terpisah untuk kebutuhan *Content-Based F
 
 Meskipun secara statistik terdeteksi sebagai outlier, data ini dianggap aman dan tidak dihapus. Outlier dalam konteks ini merepresentasikan "power users" atau pengguna yang sangat aktif. Data interaksi mereka yang kaya sangat berharga untuk melatih model Collaborative Filtering, karena memberikan sinyal preferensi yang kuat dan membantu model menemukan pola dengan lebih baik. Oleh karena itu, penanganan yang dilakukan adalah mempertahankan data ini untuk analisis lebih lanjut.
 
+Proses persiapan data dilakukan secara terpisah untuk kebutuhan *Content-Based Filtering* dan *Collaborative Filtering*.
 1\. Rekayasa Fitur untuk Content-Based Filtering  
 Tahapan ini bertujuan untuk membuat representasi fitur yang baik dari konten film (judul dan genre) agar dapat dihitung kemiripannya.
 

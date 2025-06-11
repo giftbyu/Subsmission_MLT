@@ -109,6 +109,15 @@ Meskipun secara statistik terdeteksi sebagai outlier, data ini dianggap aman dan
 
 Proses persiapan data dilakukan secara terpisah untuk kebutuhan *Content-Based Filtering* dan *Collaborative Filtering*.
 
+* **Analisis Missing Values**: Tidak ditemukan nilai yang hilang pada kedua dataset.
+*  **Analisis Duplikat**: Tidak ada data duplikat (0) pada kedua dataset, yang mengindikasikan kualitas data yang baik berdasarkan hasil ini. 
+* **Analisis Sparsity Dataset**: Matriks User-Item memiliki *sparsity* sebesar 98.30%. Ini menunjukkan bahwa sebagian besar film belum diberi rating oleh sebagian besar pengguna, yang merupakan karakteristik umum *dataset* sistem rekomendasi.  
+* **Analisis Genre Film**: Genre yang paling umum adalah Drama, diikuti oleh Comedy, Thriller, dan Action. Terdapat 34 film dengan label (no genres listed).  
+* **Distribusi Tahun Rilis Film**: Film dalam *dataset* ini memiliki rentang tahun rilis yang luas, dengan puncak distribusi pada tahun 1990-an dan awal 2000-an.
+* **Penanganan Outlier**: Analisis outlier dilakukan pada distribusi jumlah rating yang diberikan oleh setiap pengguna. Dengan menggunakan metode IQR, ditemukan bahwa pengguna yang memberikan rating lebih dari ~368 film dapat dianggap sebagai outlier statistik.
+
+Meskipun secara statistik terdeteksi sebagai outlier, data ini dianggap aman dan tidak dihapus. Outlier dalam konteks ini merepresentasikan "power users" atau pengguna yang sangat aktif. Data interaksi mereka yang kaya sangat berharga untuk melatih model Collaborative Filtering, karena memberikan sinyal preferensi yang kuat dan membantu model menemukan pola dengan lebih baik. Oleh karena itu, penanganan yang dilakukan adalah mempertahankan data ini untuk analisis lebih lanjut.
+
 1\. Rekayasa Fitur untuk Content-Based Filtering  
 Tahapan ini bertujuan untuk membuat representasi fitur yang baik dari konten film (judul dan genre) agar dapat dihitung kemiripannya.
 
@@ -148,19 +157,16 @@ Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Conten
 
 * Kekurangan: Terbatas pada fitur yang ada dan kurang memiliki kemampuan untuk menemukan hal-hal baru (serendipity).
 
-* Contoh Hasil Rekomendasi (Top-5): Berikut adalah contoh rekomendasi untuk film "Next Three Days, The (2010)".
-   
-   * Return to Paradise (1998) (Skor Kesamaan: 1.00)
-   
-   * Subway (1985) (Skor Kesamaan: 1.00)
-   
-   * Harvard Man (2001) (Skor Kesamaan: 1.00)
-   
-   * Air I Breathe, The (2007) (Skor Kesamaan: 1.00)
-   
-   * Next Three Days, The (2010) (Skor Kesamaan: 1.00)
+* Contoh Hasil Rekomendasi (Top-5): Berikut adalah contoh Rekomendasi Content-Based Filtering untuk 'Hannibal Rising (2007)':
+  
+    1. Innocents, The (1961) (Similarity: 1.00)
+    2. Body Snatcher, The (1945) (Similarity: 1.00)
+    3. Phantoms (1998) (Similarity: 1.00)
+    4. Peeping Tom (1960) (Similarity: 1.00)
+    5. Dead Ringers (1988) (Similarity: 1.00)
      
-![image](https://github.com/user-attachments/assets/5cccc635-e5c3-4af7-a345-b0913ffc39bf)
+![image](https://github.com/user-attachments/assets/179ec5d4-a837-40f0-9e1b-020d1a1c4182)
+
 
      
 
@@ -172,20 +178,17 @@ Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Conten
 
 * Kekurangan: Mengalami masalah user cold-start dan item cold-start.
 
-* Contoh Hasil Rekomendasi (Top-5 untuk UserID 33):
+* Contoh Hasil Rekomendasi (Top-5 untuk UserID 115):
 
-* Paths of Glory (1957) (Prediksi Rating: 4.70)
-   
-   * Guess Who's Coming to Dinner (1967) (Prediksi Rating: 4.69)
-   
-   * Dune (2000) (Prediksi Rating: 4.66)
-   
-   * Three Billboards Outside Ebbing, Missouri (2017) (Prediksi Rating: 4.65)
-   
-   * Adam's Rib (1949) (Prediksi Rating: 4.58)
+   Rekomendasi Film (SVD Optimal):
+    1. Paths of Glory (1957) (Predicted Rating: 4.94)
+    2. The Artist (2011) (Predicted Rating: 4.86)
+    3. Man Bites Dog (C'est arrivé près de chez vous) (1992) (Predicted Rating: 4.72)
+    4. Chinatown (1974) (Predicted Rating: 4.71)
+    5. Streetcar Named Desire, A (1951) (Predicted Rating: 4.71)
      
 
-![image](https://github.com/user-attachments/assets/a2051ee3-d564-4941-bf72-f6de09fa8e02)
+![image](https://github.com/user-attachments/assets/9a95760f-2893-4426-9723-3588a51345f9)
 
 * **3. Model Hybrid (CBF + CF-SVD)**
 
@@ -195,19 +198,16 @@ Dalam proyek ini, tiga pendekatan model sistem rekomendasi dikembangkan: *Conten
 
 * Kekurangan: Lebih kompleks untuk diimplementasikan dan memerlukan penentuan bobot yang optimal.
 
-* Contoh Hasil Rekomendasi (Top-5 untuk UserID 33, Referensi: 'Next Three Days, The (2010)'):
+* Contoh Hasil Rekomendasi (Top-5 untuk UserID 115, Referensi: 'Hannibal Rising (2007)':
    
-   * Infernal Affairs (Mou gaan dou) (2002) (Skor Hybrid: 0.88)
-   
-   * Departed, The (2006) (Skor Hybrid: 0.85)
-   
-   * Three Billboards Outside Ebbing, Missouri (2017) (Skor Hybrid: 0.85)
-   
-   * Man Bites Dog (C'est arrivé près de chez vous) (1992) (Skor Hybrid: 0.85)
-   
-   * Badlands (1973) (Skor Hybrid: 0.84)
+     1. Red Eye (2005) (Hybrid Score: 0.85)
+     2. Split (2017) (Hybrid Score: 0.84)
+     3. Carnival of Souls (1962) (Hybrid Score: 0.84)
+     4. Body Snatcher, The (1945) (Hybrid Score: 0.84)
+     5. Shrooms (2007) (Hybrid Score: 0.83)
      
-![image](https://github.com/user-attachments/assets/1cf1ba3b-cba2-4de8-ab95-9989ccdca844)
+![image](https://github.com/user-attachments/assets/88c0f208-dd3e-4b87-a3be-f2e9556f83f6)
+
 
 
 ## **Evaluation**
